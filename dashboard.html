@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TeacherChart Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="bar">
+    <h2>Teacher Status</h2>
+    <div id="userInfo"></div>
+    <button id="logout">Logout</button>
+  </header>
+
+  <main id="teacherList" class="grid"></main>
+
+  <!-- Add Teacher Form (only for full users) -->
+  <section id="addTeacherForm" class="card hidden">
+    <h3>Add Teacher</h3>
+    <input id="newName" placeholder="Name">
+    <select id="newStatus">
+      <option>Present</option>
+      <option>Absent</option>
+      <option>Late</option>
+      <option>Unavailable</option>
+    </select>
+    <button id="addTeacher">Add Teacher</button>
+  </section>
+
+  <template id="teacherCardTpl">
+    <section class="card teacher">
+      <h3 class="name"></h3>
+      <div class="row">
+        <label>Status</label>
+        <select class="status">
+          <option>Present</option>
+          <option>Absent</option>
+          <option>Late</option>
+          <option>Unavailable</option>
+        </select>
+      </div>
+      <div class="row">
+        <button class="save">Save</button>
+        <button class="delete">Delete</button>
+      </div>
+    </section>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
