@@ -1,4 +1,4 @@
-// Firebase imports
+// Firebase imports (CDN version for GitHub Pages)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
 import { 
   getAuth, 
@@ -17,7 +17,7 @@ import {
   onSnapshot 
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
-// ✅ Your Firebase config (corrected)
+// ✅ Your Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAS9_VXqbnxsnKWmb8npOZp5tA3yclkf-o",
   authDomain: "teach-ad928.firebaseapp.com",
@@ -28,6 +28,7 @@ const firebaseConfig = {
   measurementId: "G-V3YMBEHJLG"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -46,17 +47,22 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
 });
 
 document.getElementById("guestLogin")?.addEventListener("click", async () => {
-  await signInAnonymously(auth);
-  window.location.href = "dashboard.html";
+  try {
+    await signInAnonymously(auth);
+    window.location.href = "dashboard.html";
+  } catch (err) {
+    alert("Guest login failed: " + err.message);
+  }
 });
 
 // ---------------- DASHBOARD PAGE ----------------
 const teacherList = document.getElementById("teacherList");
 const addForm = document.getElementById("addTeacherForm");
 const userInfo = document.getElementById("userInfo");
+const welcomeBanner = document.getElementById("welcomeBanner");
 
 onAuthStateChanged(auth, (user) => {
-  if (!teacherList) return;
+  if (!teacherList) return; // only run on dashboard
   if (!user) {
     window.location.href = "index.html";
     return;
@@ -64,9 +70,11 @@ onAuthStateChanged(auth, (user) => {
 
   const isGuest = user.isAnonymous;
   userInfo.textContent = isGuest ? "Guest (view only)" : `User: ${user.email}`;
+  welcomeBanner.textContent = isGuest ? "Welcome Guest!" : `Welcome ${user.email.split("@")[0]}!`;
 
   if (!isGuest) addForm.classList.remove("hidden");
 
+  // Real-time Firestore sync
   onSnapshot(collection(db, "teachers"), (snapshot) => {
     teacherList.innerHTML = "";
     snapshot.forEach((docSnap) => {
@@ -119,3 +127,14 @@ document.getElementById("logout")?.addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "index.html";
 });
+
+// ---------------- THEME TOGGLE ----------------
+const themeToggle = document.getElementById("themeToggle");
+themeToggle?.addEventListener("change", () => {
+  document.body.classList.toggle("dark", themeToggle.checked);
+  document.body.classList.toggle("light", !themeToggle.checked);
+});
+
+// Default theme
+document.body.classList.add("dark");
+
