@@ -1,8 +1,75 @@
-body { background:#0f1320; color:#e7ecff; font-family:Inter,sans-serif; }
-.card { background:#171b2e; padding:20px; border-radius:12px; margin:20px; }
-input, select, button { margin:8px 0; padding:8px; border-radius:8px; border:none; }
-button { background:#6aa6ff; color:white; cursor:pointer; }
-button.ghost { background:transparent; border:1px solid #6aa6ff; }
-.hidden { display:none; }
-.fadeIn { animation: fadeIn 1.2s ease forwards; }
-@keyframes fadeIn { from {opacity:0; transform:translateY(20px);} to {opacity:1; transform:translateY(0);} }
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(135deg, #4f46e5, #9333ea); /* blue → purple gradient */
+  margin: 0;
+  padding: 0;
+  color: #fff;
+}
+
+.container {
+  max-width: 700px;
+  margin: 60px auto;
+  padding: 20px;
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  margin: 15px 0;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+input, select, button {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+  padding: 12px;
+  font-size: 15px;
+  border-radius: 6px;
+  border: none;
+}
+
+input, select {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+button {
+  background: #3b82f6; /* bright blue */
+  color: #fff;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: #9333ea; /* purple */
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.hidden {
+  display: none;
+}
+
+#teacherList .card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#teacherList select {
+  width: auto;
+  margin-left: 10px;
+}
+
+#teacherList button {
+  width: auto;
+  margin-left: 5px;
+}

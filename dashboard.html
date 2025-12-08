@@ -2,24 +2,27 @@
 <html>
 <head>
   <title>TeacherChart Dashboard</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Dashboard</h1>
-  <p id="userInfo"></p>
-  <div id="teacherList"></div>
+  <div class="container">
+    <h1>Dashboard</h1>
+    <p id="userInfo"></p>
+    <div id="teacherList"></div>
 
-  <div id="addTeacherForm" class="hidden">
-    <input id="newName" type="text" placeholder="Teacher Name">
-    <select id="newStatus">
-      <option>Present</option>
-      <option>Absent</option>
-      <option>Late</option>
-      <option>Unavailable</option>
-    </select>
-    <button id="addTeacher">Add Teacher</button>
+    <div id="addTeacherForm" class="card hidden">
+      <input id="newName" type="text" placeholder="Teacher Name">
+      <select id="newStatus">
+        <option>Present</option>
+        <option>Absent</option>
+        <option>Late</option>
+        <option>Unavailable</option>
+      </select>
+      <button id="addTeacher">Add Teacher</button>
+    </div>
+
+    <button id="logout" class="secondary">Logout</button>
   </div>
-
-  <button id="logout">Logout</button>
+  <script type="module" src="app.js"></script>
 </body>
-<script type="module" src="app.js"></script>
 </html>

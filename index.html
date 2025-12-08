@@ -2,16 +2,19 @@
 <html>
 <head>
   <title>TeacherChart Login</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Login</h1>
-  <form id="loginForm">
-    <input id="email" type="text" placeholder="Email">
-    <input id="password" type="password" placeholder="Password">
-    <button type="submit">Login</button>
-  </form>
-  <p id="loginMsg"></p>
-  <button id="guestLogin">Login as Guest</button>
+  <div class="container">
+    <h1>TeacherChart</h1>
+    <form id="loginForm" class="card">
+      <input id="email" type="text" placeholder="Email">
+      <input id="password" type="password" placeholder="Password">
+      <button type="submit">Login</button>
+    </form>
+    <p id="loginMsg"></p>
+    <button id="guestLogin" class="secondary">Login as Guest</button>
+  </div>
+  <script type="module" src="app.js"></script>
 </body>
-<script type="module" src="app.js"></script>
 </html>
