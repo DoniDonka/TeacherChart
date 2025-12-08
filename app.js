@@ -17,12 +17,12 @@ import {
   onSnapshot 
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
-// ✅ Your Firebase config
+// ✅ Your Firebase config (corrected)
 const firebaseConfig = {
   apiKey: "AIzaSyAS9_VXqbnxsnKWmb8npOZp5tA3yclkf-o",
   authDomain: "teach-ad928.firebaseapp.com",
   projectId: "teach-ad928",
-  storageBucket: "teach-ad928.appspot.com", // corrected
+  storageBucket: "teach-ad928.appspot.com", // fixed
   messagingSenderId: "149298423922",
   appId: "1:149298423922:web:110997093762458d3cfaeb",
   measurementId: "G-V3YMBEHJLG"
@@ -33,7 +33,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ---------------- LOGIN PAGE ----------------
+// ---------------- LOGIN ----------------
 document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const email = document.getElementById("email").value;
@@ -51,13 +51,13 @@ document.getElementById("guestLogin")?.addEventListener("click", async () => {
   window.location.href = "dashboard.html";
 });
 
-// ---------------- DASHBOARD PAGE ----------------
+// ---------------- DASHBOARD ----------------
 const teacherList = document.getElementById("teacherList");
 const addForm = document.getElementById("addTeacherForm");
 const userInfo = document.getElementById("userInfo");
 
 onAuthStateChanged(auth, (user) => {
-  if (!teacherList) return; // Only run on dashboard
+  if (!teacherList) return; // only run on dashboard
   if (!user) {
     window.location.href = "index.html";
     return;
@@ -68,20 +68,16 @@ onAuthStateChanged(auth, (user) => {
 
   if (!isGuest) addForm.classList.remove("hidden");
 
-  // Real-time listener for teachers
+  // Real-time Firestore sync
   onSnapshot(collection(db, "teachers"), (snapshot) => {
     teacherList.innerHTML = "";
     snapshot.forEach((docSnap) => {
       const t = docSnap.data();
       const div = document.createElement("div");
       div.className = "card";
-      div.innerHTML = `
-        <h3>${t.name}</h3>
-        <p>Status: ${t.status}</p>
-      `;
+      div.innerHTML = `<h3>${t.name}</h3><p>Status: ${t.status}</p>`;
 
       if (!isGuest) {
-        // Status dropdown
         const select = document.createElement("select");
         ["Present","Absent","Late","Unavailable"].forEach(opt => {
           const o = document.createElement("option");
@@ -92,7 +88,6 @@ onAuthStateChanged(auth, (user) => {
         });
         div.appendChild(select);
 
-        // Save button
         const saveBtn = document.createElement("button");
         saveBtn.textContent = "Save";
         saveBtn.onclick = async () => {
@@ -100,7 +95,6 @@ onAuthStateChanged(auth, (user) => {
         };
         div.appendChild(saveBtn);
 
-        // Delete button
         const delBtn = document.createElement("button");
         delBtn.textContent = "Delete";
         delBtn.onclick = async () => {
