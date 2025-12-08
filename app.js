@@ -1,23 +1,23 @@
-// Firebase imports (CDN version for GitHub Pages)
+// Firebase imports
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-import { 
-  getAuth, 
-  signInWithEmailAndPassword, 
-  signInAnonymously, 
-  onAuthStateChanged, 
-  signOut 
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  signInAnonymously,
+  onAuthStateChanged,
+  signOut
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
-import { 
-  getFirestore, 
-  collection, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  doc, 
-  onSnapshot 
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
-// ✅ Your Firebase config
+// ✅ Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAS9_VXqbnxsnKWmb8npOZp5tA3yclkf-o",
   authDomain: "teach-ad928.firebaseapp.com",
@@ -28,7 +28,6 @@ const firebaseConfig = {
   measurementId: "G-V3YMBEHJLG"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -62,7 +61,7 @@ const userInfo = document.getElementById("userInfo");
 const welcomeBanner = document.getElementById("welcomeBanner");
 
 onAuthStateChanged(auth, (user) => {
-  if (!teacherList) return; // only run on dashboard
+  if (!teacherList) return;
   if (!user) {
     window.location.href = "index.html";
     return;
@@ -74,7 +73,6 @@ onAuthStateChanged(auth, (user) => {
 
   if (!isGuest) addForm.classList.remove("hidden");
 
-  // Real-time Firestore sync
   onSnapshot(collection(db, "teachers"), (snapshot) => {
     teacherList.innerHTML = "";
     snapshot.forEach((docSnap) => {
@@ -85,7 +83,7 @@ onAuthStateChanged(auth, (user) => {
 
       if (!isGuest) {
         const select = document.createElement("select");
-        ["Present","Absent","Late","Unavailable"].forEach(opt => {
+        ["Present", "Absent", "Late", "Unavailable"].forEach(opt => {
           const o = document.createElement("option");
           o.value = opt;
           o.textContent = opt;
@@ -96,6 +94,7 @@ onAuthStateChanged(auth, (user) => {
 
         const saveBtn = document.createElement("button");
         saveBtn.textContent = "Save";
+        saveBtn.className = "primary";
         saveBtn.onclick = async () => {
           await updateDoc(doc(db, "teachers", docSnap.id), { status: select.value });
         };
@@ -103,6 +102,7 @@ onAuthStateChanged(auth, (user) => {
 
         const delBtn = document.createElement("button");
         delBtn.textContent = "Delete";
+        delBtn.className = "secondary";
         delBtn.onclick = async () => {
           await deleteDoc(doc(db, "teachers", docSnap.id));
         };
