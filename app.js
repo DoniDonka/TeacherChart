@@ -1,4 +1,4 @@
-// Firebase imports
+// Firebase imports (CDN version for GitHub Pages)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
 import { 
   getAuth, 
@@ -22,7 +22,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAS9_VXqbnxsnKWmb8npOZp5tA3yclkf-o",
   authDomain: "teach-ad928.firebaseapp.com",
   projectId: "teach-ad928",
-  storageBucket: "teach-ad928.firebasestorage.app",
+  storageBucket: "teach-ad928.appspot.com", // corrected
   messagingSenderId: "149298423922",
   appId: "1:149298423922:web:110997093762458d3cfaeb",
   measurementId: "G-V3YMBEHJLG"
