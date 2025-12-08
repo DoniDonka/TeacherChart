@@ -1,85 +1,129 @@
-// Demo user database
-const users = {
-  "Doni": "1234", // username:password
-  "Admin": "adminpass"
+// Firebase imports
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+import { 
+  getAuth, 
+  signInWithEmailAndPassword, 
+  signInAnonymously, 
+  onAuthStateChanged, 
+  signOut 
+} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+import { 
+  getFirestore, 
+  collection, 
+  addDoc, 
+  updateDoc, 
+  deleteDoc, 
+  doc, 
+  onSnapshot 
+} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+
+// ✅ Your Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyAS9_VXqbnxsnKWmb8npOZp5tA3yclkf-o",
+  authDomain: "teach-ad928.firebaseapp.com",
+  projectId: "teach-ad928",
+  storageBucket: "teach-ad928.firebasestorage.app",
+  messagingSenderId: "149298423922",
+  appId: "1:149298423922:web:110997093762458d3cfaeb",
+  measurementId: "G-V3YMBEHJLG"
 };
 
-let currentUser = null;
-let teachers = [
-  { name: "Mrs Johnson", status: "Absent" },
-  { name: "Mr Lee", status: "Present" }
-];
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-// Login form
-document.getElementById("loginForm")?.addEventListener("submit", (e) => {
+// ---------------- LOGIN PAGE ----------------
+document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const msg = document.getElementById("loginMsg");
-
-  if (users[username] && users[username] === password) {
-    currentUser = { name: username, guest: false };
-    msg.textContent = `Username: ${username}\nPassword: ${password}\nWelcome back ${username}`;
-    msg.classList.add("fadeIn");
-    setTimeout(() => window.location.href = "dashboard.html", 1500);
-  } else {
-    msg.textContent = "Invalid login";
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    window.location.href = "dashboard.html";
+  } catch (err) {
+    document.getElementById("loginMsg").textContent = "Login failed: " + err.message;
   }
 });
 
-// Guest login
-document.getElementById("guestLogin")?.addEventListener("click", () => {
-  currentUser = { name: "Guest", guest: true };
-  document.getElementById("loginMsg").textContent = "Welcome Guest (view only)";
-  setTimeout(() => window.location.href = "dashboard.html", 1000);
+document.getElementById("guestLogin")?.addEventListener("click", async () => {
+  await signInAnonymously(auth);
+  window.location.href = "dashboard.html";
 });
 
-// Dashboard logic
+// ---------------- DASHBOARD PAGE ----------------
 const teacherList = document.getElementById("teacherList");
 const addForm = document.getElementById("addTeacherForm");
 const userInfo = document.getElementById("userInfo");
 
-if (teacherList) {
-  userInfo.textContent = currentUser?.guest ? "Guest (view only)" : `User: ${currentUser?.name}`;
-  if (!currentUser?.guest) addForm.classList.remove("hidden");
+onAuthStateChanged(auth, (user) => {
+  if (!teacherList) return; // Only run on dashboard
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
 
-  const tpl = document.getElementById("teacherCardTpl");
-  teachers.forEach((t, idx) => {
-    const node = tpl.content.cloneNode(true);
-    node.querySelector(".name").textContent = t.name;
-    const statusEl = node.querySelector(".status");
-    statusEl.value = t.status;
-    const saveBtn = node.querySelector(".save");
-    const deleteBtn = node.querySelector(".delete");
+  const isGuest = user.isAnonymous;
+  userInfo.textContent = isGuest ? "Guest (view only)" : `User: ${user.email}`;
 
-    if (currentUser?.guest) {
-      statusEl.disabled = true;
-      saveBtn.style.display = "none";
-      deleteBtn.style.display = "none";
-    } else {
-      saveBtn.addEventListener("click", () => {
-        teachers[idx].status = statusEl.value;
-        alert(`${t.name} updated to ${statusEl.value}`);
-      });
-      deleteBtn.addEventListener("click", () => {
-        teachers.splice(idx, 1);
-        alert(`${t.name} deleted`);
-        window.location.reload();
-      });
-    }
-    teacherList.appendChild(node);
+  if (!isGuest) addForm.classList.remove("hidden");
+
+  // Real-time listener for teachers
+  onSnapshot(collection(db, "teachers"), (snapshot) => {
+    teacherList.innerHTML = "";
+    snapshot.forEach((docSnap) => {
+      const t = docSnap.data();
+      const div = document.createElement("div");
+      div.className = "card";
+      div.innerHTML = `
+        <h3>${t.name}</h3>
+        <p>Status: ${t.status}</p>
+      `;
+
+      if (!isGuest) {
+        // Status dropdown
+        const select = document.createElement("select");
+        ["Present","Absent","Late","Unavailable"].forEach(opt => {
+          const o = document.createElement("option");
+          o.value = opt;
+          o.textContent = opt;
+          if (opt === t.status) o.selected = true;
+          select.appendChild(o);
+        });
+        div.appendChild(select);
+
+        // Save button
+        const saveBtn = document.createElement("button");
+        saveBtn.textContent = "Save";
+        saveBtn.onclick = async () => {
+          await updateDoc(doc(db, "teachers", docSnap.id), { status: select.value });
+        };
+        div.appendChild(saveBtn);
+
+        // Delete button
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "Delete";
+        delBtn.onclick = async () => {
+          await deleteDoc(doc(db, "teachers", docSnap.id));
+        };
+        div.appendChild(delBtn);
+      }
+
+      teacherList.appendChild(div);
+    });
   });
+});
 
-  document.getElementById("addTeacher")?.addEventListener("click", () => {
-    const name = document.getElementById("newName").value;
-    const status = document.getElementById("newStatus").value;
-    teachers.push({ name, status });
-    alert(`${name} added`);
-    window.location.reload();
-  });
-}
+// Add teacher
+document.getElementById("addTeacher")?.addEventListener("click", async () => {
+  const name = document.getElementById("newName").value;
+  const status = document.getElementById("newStatus").value;
+  if (name.trim() === "") return;
+  await addDoc(collection(db, "teachers"), { name, status });
+});
 
-document.getElementById("logout")?.addEventListener("click", () => {
-  currentUser = null;
+// Logout
+document.getElementById("logout")?.addEventListener("click", async () => {
+  await signOut(auth);
   window.location.href = "index.html";
 });
